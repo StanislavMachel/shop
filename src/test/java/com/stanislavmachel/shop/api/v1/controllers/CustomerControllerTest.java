@@ -19,11 +19,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class CustomerControllerTest {
+public class CustomerControllerTest extends AbstractRestControllerTest{
 
+	private static final String API_V1_CUSTOMERS = "/api/v1/customers/";
 	@InjectMocks
 	CustomerController customerController;
 
@@ -75,7 +77,7 @@ public class CustomerControllerTest {
 
 		when(customerService.getById(id)).thenReturn(customerDto);
 
-		mockMvc.perform(get("/api/v1/customers/" + id).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get(API_V1_CUSTOMERS + id).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.firstName", equalTo(firstName)))
 				.andExpect(jsonPath("$.lastName", equalTo(lastName)));
@@ -85,8 +87,29 @@ public class CustomerControllerTest {
 	public void getByIdWhenCustomerNotExist() throws Exception {
 		when(customerService.getById(any(UUID.class))).thenThrow(new RuntimeException());
 
-		mockMvc.perform(get("/api/v1/customers/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get(API_V1_CUSTOMERS + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
+
+	@Test
+	public void create() throws Exception {
+		CustomerDto customerDtoToCreate = CustomerDtoTestUtils.getCustomerDto("John", "Snow");
+
+		UUID createdCustomerId = UUID.randomUUID();
+
+
+		CustomerDto createdCustomerDto = CustomerDtoTestUtils.getCustomerDto(createdCustomerId, customerDtoToCreate.getFirstName(), customerDtoToCreate.getLastName());
+
+		when(customerService.create(customerDtoToCreate)).thenReturn(createdCustomerDto);
+
+
+		mockMvc.perform(post(API_V1_CUSTOMERS).contentType(MediaType.APPLICATION_JSON).content(asJsonString(customerDtoToCreate)))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.firstName", equalTo(customerDtoToCreate.getFirstName())))
+				.andExpect(jsonPath("$.lastName", equalTo(customerDtoToCreate.getLastName())))
+				.andExpect(jsonPath("$.url", equalTo(API_V1_CUSTOMERS + createdCustomerId)));
+
+	}
+
 
 }
