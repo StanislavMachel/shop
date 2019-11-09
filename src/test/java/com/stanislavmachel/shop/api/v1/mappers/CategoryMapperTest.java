@@ -3,11 +3,11 @@ package com.stanislavmachel.shop.api.v1.mappers;
 import com.stanislavmachel.shop.api.v1.model.CategoryDto;
 import com.stanislavmachel.shop.domain.Category;
 import org.junit.Test;
-import org.mapstruct.factory.Mappers;
 
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class CategoryMapperTest {
 
