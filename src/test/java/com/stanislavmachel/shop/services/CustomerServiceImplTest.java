@@ -153,4 +153,30 @@ public class CustomerServiceImplTest {
 		when(customerRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 		customerService.update(UUID.randomUUID(), new CustomerDto());
 	}
+
+
+	@Test
+	public void patch(){
+		UUID id = UUID.randomUUID();
+		String oldFirsName = "Old firstname";
+		String oldLastName = "Old lastname";
+		String newFirstName = "New firstname";
+
+		Customer customer = new Customer();
+		customer.setId(id);
+		customer.setFirstName(oldFirsName);
+		customer.setLastName(oldLastName);
+
+		when(customerRepository.findById(id)).thenReturn(Optional.of(customer));
+
+		customer.setFirstName(newFirstName);
+
+		when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+
+		CustomerDto customerDto = new CustomerDto();
+		customerDto.setFirstName(newFirstName);
+		customerDto.setLastName(oldLastName);
+
+		CustomerDto newCustomerDto = customerService.patch(id, customerDto);
+	}
 }

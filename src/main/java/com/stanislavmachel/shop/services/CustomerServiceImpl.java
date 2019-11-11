@@ -51,4 +51,9 @@ public class CustomerServiceImpl implements CustomerService {
 					return customerMapper.customerToCustomerDto(customerRepository.save(customer));
 				}).orElseThrow(() -> new IllegalArgumentException("Customer with id: " + id + " not exist"));
 	}
+
+	@Override
+	public CustomerDto patch(UUID id, CustomerDto customerDto) {
+		return null;
+	}
 }
