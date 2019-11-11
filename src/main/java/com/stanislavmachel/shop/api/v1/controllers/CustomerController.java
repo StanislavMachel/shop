@@ -38,4 +38,14 @@ public class CustomerController {
 	public ResponseEntity<CustomerDto> create(@RequestBody CustomerDto customerDto) {
 		return new ResponseEntity<>(customerService.create(customerDto), HttpStatus.CREATED);
 	}
+
+	@PutMapping("{id}")
+	public ResponseEntity<CustomerDto> update(@PathVariable UUID id, @RequestBody CustomerDto customerDto) {
+		try {
+			return new ResponseEntity<>(customerService.update(id, customerDto), HttpStatus.OK);
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.badRequest().build();
+		}
+
+	}
 }

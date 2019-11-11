@@ -18,14 +18,13 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class CustomerControllerTest extends AbstractRestControllerTest{
+public class CustomerControllerTest extends AbstractRestControllerTest {
 
-	private static final String API_V1_CUSTOMERS = "/api/v1/customers/";
+	private static final String API_V1_CUSTOMERS_URL = "/api/v1/customers/";
 	@InjectMocks
 	CustomerController customerController;
 
@@ -77,7 +76,7 @@ public class CustomerControllerTest extends AbstractRestControllerTest{
 
 		when(customerService.getById(id)).thenReturn(customerDto);
 
-		mockMvc.perform(get(API_V1_CUSTOMERS + id).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get(API_V1_CUSTOMERS_URL + id).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.firstName", equalTo(firstName)))
 				.andExpect(jsonPath("$.lastName", equalTo(lastName)));
@@ -87,7 +86,7 @@ public class CustomerControllerTest extends AbstractRestControllerTest{
 	public void getByIdWhenCustomerNotExist() throws Exception {
 		when(customerService.getById(any(UUID.class))).thenThrow(new RuntimeException());
 
-		mockMvc.perform(get(API_V1_CUSTOMERS + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get(API_V1_CUSTOMERS_URL + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
 
@@ -103,12 +102,45 @@ public class CustomerControllerTest extends AbstractRestControllerTest{
 		when(customerService.create(customerDtoToCreate)).thenReturn(createdCustomerDto);
 
 
-		mockMvc.perform(post(API_V1_CUSTOMERS).contentType(MediaType.APPLICATION_JSON).content(asJsonString(customerDtoToCreate)))
+		mockMvc.perform(post(API_V1_CUSTOMERS_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(customerDtoToCreate)))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.firstName", equalTo(customerDtoToCreate.getFirstName())))
 				.andExpect(jsonPath("$.lastName", equalTo(customerDtoToCreate.getLastName())))
-				.andExpect(jsonPath("$.url", equalTo(API_V1_CUSTOMERS + createdCustomerId)));
+				.andExpect(jsonPath("$.url", equalTo(API_V1_CUSTOMERS_URL + createdCustomerId)));
 
+	}
+
+	@Test
+	public void updateIfCustomerExists() throws Exception {
+		UUID id = UUID.randomUUID();
+		String newFirstName = "newFirstName";
+		String newLastName = "newLastName";
+
+		CustomerDto updatedDto = new CustomerDto();
+		updatedDto.setFirstName(newFirstName);
+		updatedDto.setLastName(newLastName);
+
+		when(customerService.update(any(UUID.class), any(CustomerDto.class))).thenReturn(updatedDto);
+
+		mockMvc.perform(
+				put(API_V1_CUSTOMERS_URL + id)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(asJsonString(updatedDto)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.firstName", equalTo(newFirstName)))
+				.andExpect(jsonPath("$.lastName", equalTo(newLastName)));
+
+	}
+
+	@Test
+	public void updateIfCustomerNotExist() throws Exception {
+		when(customerService.update(any(UUID.class), any(CustomerDto.class))).thenThrow(new IllegalArgumentException());
+
+		mockMvc.perform(
+				put(API_V1_CUSTOMERS_URL + UUID.randomUUID())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(asJsonString(new CustomerDto())))
+				.andExpect(status().isBadRequest());
 	}
 
 

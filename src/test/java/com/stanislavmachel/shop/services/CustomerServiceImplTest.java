@@ -21,6 +21,8 @@ import static org.mockito.Mockito.when;
 
 public class CustomerServiceImplTest {
 
+	private static final String API_V1_CUSTOMERS_URL = "/api/v1/customers/";
+
 	@Mock
 	CustomerRepository customerRepository;
 
@@ -61,7 +63,7 @@ public class CustomerServiceImplTest {
 		assertNotNull(customerDto);
 		assertEquals(firstName, customerDto.getFirstName());
 		assertEquals(lastName, customerDto.getLastName());
-		assertEquals("/api/v1/customers/" + id, customerDto.getUrl());
+		assertEquals(API_V1_CUSTOMERS_URL + id, customerDto.getUrl());
 	}
 
 	@Test
@@ -87,7 +89,7 @@ public class CustomerServiceImplTest {
 
 		assertEquals(firstName, createdCustomerDto.getFirstName());
 		assertEquals(lastName, createdCustomerDto.getLastName());
-		assertEquals("/api/v1/customers/" + id, createdCustomerDto.getUrl());
+		assertEquals(API_V1_CUSTOMERS_URL + id, createdCustomerDto.getUrl());
 
 	}
 
@@ -109,5 +111,46 @@ public class CustomerServiceImplTest {
 		customer3.setId(customer3Id);
 		customer3.setFirstName("Tyrion");
 		customer3.setLastName("Lannister");
+	}
+
+	@Test
+	public void updateExistingCustomer() {
+		UUID id = UUID.randomUUID();
+		String newFirsName = "NewFirsName";
+		String newLastName = "NewLastName";
+
+		Customer customer = new Customer();
+		customer.setId(id);
+		customer.setFirstName("OldFirsName");
+		customer.setLastName("OldLastName");
+
+		when(customerRepository.findById(id)).thenReturn(Optional.of(customer));
+
+		Customer updatedCustomer = new Customer();
+		updatedCustomer.setId(id);
+
+
+		updatedCustomer.setFirstName(newFirsName);
+
+		updatedCustomer.setLastName(newLastName);
+
+		when(customerRepository.save(any(Customer.class))).thenReturn(updatedCustomer);
+
+		CustomerDto customerDto = new CustomerDto();
+		customerDto.setFirstName(newFirsName);
+		customerDto.setLastName(newLastName);
+
+		CustomerDto updatedCustomerDto = customerService.update(id, customerDto);
+
+		assertEquals(newFirsName, updatedCustomerDto.getFirstName());
+		assertEquals(newLastName, updatedCustomerDto.getLastName());
+		assertEquals(API_V1_CUSTOMERS_URL + id, updatedCustomerDto.getUrl());
+
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void updateIfCustomerNotExist() {
+		when(customerRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+		customerService.update(UUID.randomUUID(), new CustomerDto());
 	}
 }
