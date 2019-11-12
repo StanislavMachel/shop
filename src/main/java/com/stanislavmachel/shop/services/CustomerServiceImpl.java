@@ -67,4 +67,9 @@ public class CustomerServiceImpl implements CustomerService {
 			return customerMapper.customerToCustomerDto(customerRepository.save(customer));
 		}).orElseThrow(() -> new IllegalArgumentException("Customer with id: " + id + " not exist"));
 	}
+
+	@Override
+	public void deleteById(UUID id) {
+		customerRepository.deleteById(id);
+	}
 }

@@ -57,4 +57,12 @@ public class CustomerController {
 			return ResponseEntity.badRequest().build();
 		}
 	}
+
+	@DeleteMapping("{id}")
+	public ResponseEntity<Void> delete(@PathVariable UUID id){
+
+		customerService.deleteById(id);
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

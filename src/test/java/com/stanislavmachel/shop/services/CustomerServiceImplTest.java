@@ -17,8 +17,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CustomerServiceImplTest {
 
@@ -262,5 +261,12 @@ public class CustomerServiceImplTest {
 
 		assertEquals(newFirstName, newCustomerDto.getFirstName());
 		assertEquals(newLastName, newCustomerDto.getLastName());
+	}
+
+	@Test
+	public void deleteById() {
+		customerService.deleteById(UUID.randomUUID());
+
+		verify(customerRepository, times(1)).deleteById(any(UUID.class));
 	}
 }
