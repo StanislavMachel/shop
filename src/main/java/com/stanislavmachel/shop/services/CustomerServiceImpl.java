@@ -54,6 +54,17 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public CustomerDto patch(UUID id, CustomerDto customerDto) {
-		return null;
+		return customerRepository.findById(id).map(customer -> {
+
+			if (customerDto.getFirstName() != null) {
+				customer.setFirstName(customerDto.getFirstName());
+			}
+
+			if (customerDto.getLastName() != null) {
+				customer.setLastName(customerDto.getLastName());
+			}
+
+			return customerMapper.customerToCustomerDto(customerRepository.save(customer));
+		}).orElseThrow(() -> new IllegalArgumentException("Customer with id: " + id + " not exist"));
 	}
 }
