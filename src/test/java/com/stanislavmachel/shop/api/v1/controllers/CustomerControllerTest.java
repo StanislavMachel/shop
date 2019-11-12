@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -167,6 +167,16 @@ public class CustomerControllerTest extends AbstractRestControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.firstName", equalTo(oldFirstname)))
 				.andExpect(jsonPath("$.lastName", equalTo(newLastname)));
+	}
+
+	@Test
+	public void deleteTest() throws Exception {
+		UUID id = UUID.randomUUID();
+
+		mockMvc.perform(delete(API_V1_CUSTOMERS_URL + id).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+
+		verify(customerService, times(1)).deleteById(any(UUID.class));
 	}
 
 }
