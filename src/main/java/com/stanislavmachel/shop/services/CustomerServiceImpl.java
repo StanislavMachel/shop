@@ -41,4 +41,30 @@ public class CustomerServiceImpl implements CustomerService {
 				customerRepository.save(
 						customerMapper.customerDtoToCustomer(customerDto)));
 	}
+
+	@Override
+	public CustomerDto update(UUID id, CustomerDto customerDto) {
+		return customerRepository.findById(id)
+				.map(customer -> {
+					customer.setFirstName(customerDto.getFirstName());
+					customer.setLastName(customerDto.getLastName());
+					return customerMapper.customerToCustomerDto(customerRepository.save(customer));
+				}).orElseThrow(() -> new IllegalArgumentException("Customer with id: " + id + " not exist"));
+	}
+
+	@Override
+	public CustomerDto patch(UUID id, CustomerDto customerDto) {
+		return customerRepository.findById(id).map(customer -> {
+
+			if (customerDto.getFirstName() != null) {
+				customer.setFirstName(customerDto.getFirstName());
+			}
+
+			if (customerDto.getLastName() != null) {
+				customer.setLastName(customerDto.getLastName());
+			}
+
+			return customerMapper.customerToCustomerDto(customerRepository.save(customer));
+		}).orElseThrow(() -> new IllegalArgumentException("Customer with id: " + id + " not exist"));
+	}
 }
