@@ -17,6 +17,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.when;
 
 public class CustomerServiceImplTest {
@@ -152,5 +153,114 @@ public class CustomerServiceImplTest {
 	public void updateIfCustomerNotExist() {
 		when(customerRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 		customerService.update(UUID.randomUUID(), new CustomerDto());
+	}
+
+
+	@Test
+	public void patchWhenOnlyFirstNameUpdated() {
+		UUID id = UUID.randomUUID();
+		String oldFirsName = "Old firstname";
+		String oldLastName = "Old lastname";
+		String newFirstName = "New firstname";
+
+		Customer customer = new Customer();
+		customer.setId(id);
+		customer.setFirstName(oldFirsName);
+		customer.setLastName(oldLastName);
+
+		when(customerRepository.findById(argThat(argument -> argument.equals(id)))).thenReturn(Optional.of(customer));
+
+
+		Customer updatedCustomer = new Customer();
+		updatedCustomer.setId(id);
+		updatedCustomer.setFirstName(newFirstName);
+		updatedCustomer.setLastName(oldLastName);
+
+		when(customerRepository.save(
+				argThat(argument ->
+						argument.getId().equals(updatedCustomer.getId()) &&
+								argument.getFirstName().equals(updatedCustomer.getFirstName()) &&
+								argument.getLastName().equals(updatedCustomer.getLastName())))).thenReturn(updatedCustomer);
+
+		CustomerDto customerDto = new CustomerDto();
+		customerDto.setFirstName(newFirstName);
+		customerDto.setLastName(oldLastName);
+
+		CustomerDto newCustomerDto = customerService.patch(id, customerDto);
+
+		assertEquals(newFirstName, newCustomerDto.getFirstName());
+		assertEquals(oldLastName, newCustomerDto.getLastName());
+	}
+
+	@Test
+	public void patchIfOnlyLastnameUpdated() {
+		UUID id = UUID.randomUUID();
+		String oldFirsName = "Old firstname";
+		String oldLastName = "Old lastname";
+		String newLastName = "New lastname";
+
+		Customer customer = new Customer();
+		customer.setId(id);
+		customer.setFirstName(oldFirsName);
+		customer.setLastName(oldLastName);
+
+		when(customerRepository.findById(argThat(argument -> argument.equals(id)))).thenReturn(Optional.of(customer));
+
+
+		Customer updatedCustomer = new Customer();
+		updatedCustomer.setId(id);
+		updatedCustomer.setFirstName(oldFirsName);
+		updatedCustomer.setLastName(newLastName);
+
+		when(customerRepository.save(
+				argThat(argument ->
+						argument.getId().equals(updatedCustomer.getId()) &&
+								argument.getFirstName().equals(updatedCustomer.getFirstName()) &&
+								argument.getLastName().equals(updatedCustomer.getLastName())))).thenReturn(updatedCustomer);
+
+		CustomerDto customerDto = new CustomerDto();
+		customerDto.setFirstName(oldFirsName);
+		customerDto.setLastName(newLastName);
+
+		CustomerDto newCustomerDto = customerService.patch(id, customerDto);
+
+		assertEquals(oldFirsName, newCustomerDto.getFirstName());
+		assertEquals(newLastName, newCustomerDto.getLastName());
+	}
+
+	@Test
+	public void patchIfFirstnameAndLastnameUpdated() {
+		UUID id = UUID.randomUUID();
+		String oldFirsName = "Old firstname";
+		String oldLastName = "Old lastname";
+		String newFirstName = "New firstname";
+		String newLastName = "New lastname";
+
+		Customer customer = new Customer();
+		customer.setId(id);
+		customer.setFirstName(oldFirsName);
+		customer.setLastName(oldLastName);
+
+		when(customerRepository.findById(argThat(argument -> argument.equals(id)))).thenReturn(Optional.of(customer));
+
+		Customer updatedCustomer = new Customer();
+		updatedCustomer.setId(id);
+		updatedCustomer.setFirstName(newFirstName);
+		updatedCustomer.setLastName(newLastName);
+
+		when(customerRepository.save(
+				argThat(argument ->
+						argument.getId().equals(updatedCustomer.getId()) &&
+								argument.getFirstName().equals(updatedCustomer.getFirstName()) &&
+								argument.getLastName().equals(updatedCustomer.getLastName())))).thenReturn(updatedCustomer);
+
+		CustomerDto customerDto = new CustomerDto();
+		customerDto.setFirstName(newFirstName);
+		customerDto.setLastName(newLastName);
+
+		CustomerDto newCustomerDto = customerService.patch(id, customerDto);
+
+		assertEquals(newFirstName, newCustomerDto.getFirstName());
+		assertEquals(newLastName, newCustomerDto.getLastName());
 	}
 }

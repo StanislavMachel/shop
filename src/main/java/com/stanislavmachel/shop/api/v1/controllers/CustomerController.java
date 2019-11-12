@@ -46,6 +46,15 @@ public class CustomerController {
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.badRequest().build();
 		}
+	}
 
+	@PatchMapping("{id}")
+	public ResponseEntity<CustomerDto> patch(@PathVariable UUID id, @RequestBody CustomerDto customerDto){
+		try {
+			return new ResponseEntity<>(customerService.patch(id, customerDto), HttpStatus.OK);
+		}
+		catch (IllegalArgumentException e){
+			return ResponseEntity.badRequest().build();
+		}
 	}
 }

@@ -144,4 +144,29 @@ public class CustomerControllerTest extends AbstractRestControllerTest {
 	}
 
 
+	@Test
+	public void patchTest() throws Exception {
+
+		String oldFirstname = "Old firstname";
+		String newLastname= "New lastname";
+
+
+		CustomerDto customerDto = new CustomerDto();
+		customerDto.setFirstName(oldFirstname);
+		customerDto.setLastName(newLastname);
+
+		when(customerService.patch(any(UUID.class), any(CustomerDto.class))).thenReturn(customerDto);
+
+		CustomerDto customerDtoForUpdate = new CustomerDto();
+		customerDtoForUpdate.setLastName(newLastname);
+
+		mockMvc.perform(
+				patch(API_V1_CUSTOMERS_URL + UUID.randomUUID()).
+						contentType(MediaType.APPLICATION_JSON)
+						.content(asJsonString(customerDtoForUpdate)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.firstName", equalTo(oldFirstname)))
+				.andExpect(jsonPath("$.lastName", equalTo(newLastname)));
+	}
+
 }
