@@ -27,11 +27,7 @@ public class CustomerController {
 
 	@GetMapping("{id}")
 	public ResponseEntity<CustomerDto> getById(@PathVariable UUID id) {
-		try {
-			return new ResponseEntity<>(customerService.getById(id), HttpStatus.OK);
-		} catch (RuntimeException e) {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<>(customerService.getById(id), HttpStatus.OK);
 	}
 
 	@PostMapping
@@ -41,25 +37,16 @@ public class CustomerController {
 
 	@PutMapping("{id}")
 	public ResponseEntity<CustomerDto> update(@PathVariable UUID id, @RequestBody CustomerDto customerDto) {
-		try {
-			return new ResponseEntity<>(customerService.update(id, customerDto), HttpStatus.OK);
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.badRequest().build();
-		}
+		return new ResponseEntity<>(customerService.update(id, customerDto), HttpStatus.OK);
 	}
 
 	@PatchMapping("{id}")
-	public ResponseEntity<CustomerDto> patch(@PathVariable UUID id, @RequestBody CustomerDto customerDto){
-		try {
-			return new ResponseEntity<>(customerService.patch(id, customerDto), HttpStatus.OK);
-		}
-		catch (IllegalArgumentException e){
-			return ResponseEntity.badRequest().build();
-		}
+	public ResponseEntity<CustomerDto> patch(@PathVariable UUID id, @RequestBody CustomerDto customerDto) {
+		return new ResponseEntity<>(customerService.patch(id, customerDto), HttpStatus.OK);
 	}
 
 	@DeleteMapping("{id}")
-	public ResponseEntity<Void> delete(@PathVariable UUID id){
+	public ResponseEntity<Void> delete(@PathVariable UUID id) {
 
 		customerService.deleteById(id);
 

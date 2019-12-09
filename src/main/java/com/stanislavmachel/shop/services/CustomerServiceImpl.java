@@ -32,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public CustomerDto getById(UUID id) {
 		return customerRepository.findById(id)
 				.map(customerMapper::customerToCustomerDto)
-				.orElseThrow(() -> new RuntimeException("Customer with id: " + id + " not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Customer with id: " + id + " not found"));
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class CustomerServiceImpl implements CustomerService {
 					customer.setFirstName(customerDto.getFirstName());
 					customer.setLastName(customerDto.getLastName());
 					return customerMapper.customerToCustomerDto(customerRepository.save(customer));
-				}).orElseThrow(() -> new IllegalArgumentException("Customer with id: " + id + " not exist"));
+				}).orElseThrow(() -> new ResourceNotFoundException("Customer with id: " + id + " not exist"));
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
 			}
 
 			return customerMapper.customerToCustomerDto(customerRepository.save(customer));
-		}).orElseThrow(() -> new IllegalArgumentException("Customer with id: " + id + " not exist"));
+		}).orElseThrow(() -> new ResourceNotFoundException("Customer with id: " + id + " not exist"));
 	}
 
 	@Override

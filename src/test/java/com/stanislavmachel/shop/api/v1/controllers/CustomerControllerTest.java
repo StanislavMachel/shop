@@ -1,7 +1,9 @@
 package com.stanislavmachel.shop.api.v1.controllers;
 
+import com.stanislavmachel.shop.api.v1.handlers.RestResponseEntityExceptionHandler;
 import com.stanislavmachel.shop.api.v1.model.CustomerDto;
 import com.stanislavmachel.shop.services.CustomerService;
+import com.stanislavmachel.shop.services.ResourceNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +38,9 @@ public class CustomerControllerTest extends AbstractRestControllerTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
+		mockMvc = MockMvcBuilders.standaloneSetup(customerController)
+				.setControllerAdvice(new RestResponseEntityExceptionHandler())
+				.build();
 	}
 
 	@Test
@@ -84,7 +88,7 @@ public class CustomerControllerTest extends AbstractRestControllerTest {
 
 	@Test
 	public void getByIdWhenCustomerNotExist() throws Exception {
-		when(customerService.getById(any(UUID.class))).thenThrow(new RuntimeException());
+		when(customerService.getById(any(UUID.class))).thenThrow(new ResourceNotFoundException());
 
 		mockMvc.perform(get(API_V1_CUSTOMERS_URL + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
@@ -134,13 +138,13 @@ public class CustomerControllerTest extends AbstractRestControllerTest {
 
 	@Test
 	public void updateIfCustomerNotExist() throws Exception {
-		when(customerService.update(any(UUID.class), any(CustomerDto.class))).thenThrow(new IllegalArgumentException());
+		when(customerService.update(any(UUID.class), any(CustomerDto.class))).thenThrow(new ResourceNotFoundException());
 
 		mockMvc.perform(
 				put(API_V1_CUSTOMERS_URL + UUID.randomUUID())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(asJsonString(new CustomerDto())))
-				.andExpect(status().isBadRequest());
+				.andExpect(status().isNotFound());
 	}
 
 
