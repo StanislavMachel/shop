@@ -4,16 +4,13 @@ import com.stanislavmachel.shop.api.v1.model.CategoryDto;
 import com.stanislavmachel.shop.api.v1.model.CatorgoryListDto;
 import com.stanislavmachel.shop.services.CategoryService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/api/v1/categories")
+@RestController
+@RequestMapping(CategoryController.BASE_URL)
 public class CategoryController {
 
+	public static final String BASE_URL = "/api/v1/categories";
 	private final CategoryService categoryService;
 
 	public CategoryController(CategoryService categoryService) {
@@ -21,13 +18,15 @@ public class CategoryController {
 	}
 
 	@GetMapping
-	public ResponseEntity<CatorgoryListDto> getAll() {
-		return new ResponseEntity<>(new CatorgoryListDto(categoryService.getAll()), HttpStatus.OK);
+	@ResponseStatus(HttpStatus.OK)
+	public CatorgoryListDto getAll() {
+		return new CatorgoryListDto(categoryService.getAll());
 	}
 
 	@GetMapping("{name}")
-	public ResponseEntity<CategoryDto> getByName(@PathVariable String name) {
-		return new ResponseEntity<>(categoryService.getByName(name), HttpStatus.OK);
+	@ResponseStatus(HttpStatus.OK)
+	public CategoryDto getByName(@PathVariable String name) {
+		return categoryService.getByName(name);
 	}
 
 }
