@@ -148,7 +148,7 @@ public class CustomerServiceImplTest {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ResourceNotFoundException.class)
 	public void updateIfCustomerNotExist() {
 		when(customerRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 		customerService.update(UUID.randomUUID(), new CustomerDto());

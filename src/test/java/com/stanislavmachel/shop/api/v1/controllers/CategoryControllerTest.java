@@ -1,5 +1,6 @@
 package com.stanislavmachel.shop.api.v1.controllers;
 
+import com.stanislavmachel.shop.api.v1.handlers.RestResponseEntityExceptionHandler;
 import com.stanislavmachel.shop.api.v1.model.CategoryDto;
 import com.stanislavmachel.shop.services.CategoryService;
 import org.junit.Before;
@@ -35,7 +36,9 @@ public class CategoryControllerTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
+		mockMvc = MockMvcBuilders.standaloneSetup(categoryController)
+				.setControllerAdvice(new RestResponseEntityExceptionHandler())
+				.build();
 	}
 
 	@Test
